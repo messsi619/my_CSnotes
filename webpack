@@ -148,3 +148,4 @@ npm i安装 引入 newplugin 在主文件注册service worker 遇到的问题：
 
 pwa问题：兼容性比较差 
 
+合并生产/开发模式需要用 process.env.NODE_ENV判断
