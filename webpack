@@ -1,0 +1,150 @@
+# Webpack
+
+###### webpack是基于node.js的。（遵守commonjs）webpack是一个用于现代JavaScript应用程序的静态模块打包工具，是基于node.js开发的，使用时需要有node.js组件支持；需要使用npm或者cnpm进行安装，语法“cnpm install webpack -g”。
+
+#### Why
+
+一些框架诸如vue，react，或者一些sassless预处理器语法或者es6的模块语法，浏览器都需要编译成js，css等才可以运行。打包工具就是做这件事的。另外它还可以提高运行效率，做兼容性处理，提升性能。
+
+#### What
+
+Grunt  Gulp Parcel **webpack** Rollup Vite等等
+
+#### Webpack的基本使用
+
+他是一个静态打包工具。把项目中的所有文件组合成一个或多个打包出去，就能在浏览器中运行了。output叫bundle
+
+#### 功能
+
+它本身仅仅能处理一些js代码，样式性的文件他处理不了，所以需要增加一些配置来强大其功能。
+
+##### 使用 npm init -y初始化生成package.json文件。安装webpack，webpack-cli；npx webpack 入口文件路径 --mode=development。一些模块化语法就被webpack编译可以运行在brower了。
+
+#### 基本配置
+
+1.entry（入口）：相对路径入口文件
+
+2.output：是一个对象，有两个属性：path与filename。其中path是绝对路径。
+
+3.module：{rules：[]}    (放一些loader)
+
+4.plugins:[]
+
+5.mode:(dev/product)
+
+#### 配置文件：
+
+webpack.config.js配置文件必须放在根目录。
+
+#### loader
+
+样式loader：css loader  style loader  sass loader  less loader  stylus loader
+
+图片资源处理loader：file-loader  url-loader（webpack 4）
+
+可配置打包清除上一次：在输出里面加clear：true以及修改输出目录查文档
+
+处理mp3mp4等其他资源在modules里面配asset/resource
+
+处理js资源babel（webpack本身只能处理编译es6模块化语法，像一些箭头函数拓展运算符不可以编译转化，babel可以做到，另外还可以将一些jsx语法，ts语法转化成可执行js。
+
+#### eslint ：
+
+语法检查需要配，一般情况继承官方配好的就好（extends）还需要在根目录创建。eslintrc.js配置文件。dist打包输出目录不需要检查，于是再在根目录下增加.eslintignore.js忽略文件。
+
+#### 处理html资源：
+
+配个HTMLWebpackPlugins插件，里面配template找public/index.html为模板。就可以自动展示打包好的html文件。
+
+#### 解决每次改源代码就要重新打包的问题/自动化：
+
+**dev-server：** npm i webpack-dev-server -D 之后再配置文件进行配置。 自动监视src目录下的源代码文件，改变自动打包。
+
+npx webpack serve 运行启动dev-server。由于是开发环境下的开发服务器我们只需要看界面效果。所以不会在dist中输出文件，都是在内存中编译打包的
+
+## 生产模式
+
+#### 部署上线代码，要对开发环境下的代码做优化，性能提升，让客户体验更好
+
+css处理：在开发模式下，css通过css loader以及style loader加到js代码里，js解析时动态创建style标签加载样式。所以会出现闪屏现象。体验不好。‘解决办法：单独css文件，通过link引入加载性能更好。把style loader改成MiniCssExtractPlugin.loader。
+
+css兼容性处理：js兼容性处理babel。npm i postcss-loader postcss postcss-preset-env -D.需要把postcss-loader放到use数组css-loader与less-loader之间（它是从右往左）
+
+css压缩：CssMinimizerWebpackPlugin插件
+
+js以及html文件
+
+：默认审核生产模式已经进行压缩。
+
+# webpack高级
+
+#### 提升开发体验：
+
+sourcemap：有时候代码出问题，编译后的文件出错位置比较闹眼睛。此技术就解决了这个问题：生成一个.map文件，这个文件是存了一个源代码与构建编译后代码的对应映射表，（可以通过构建后代码 -->源代码找到具体问题所在位置。）
+
+devtool：开发环境下cheap-module-source-map (只关心行不关心列)，生产环境下（都关注）。
+
+#### 提升打包构建速度：
+
+#### HotMouduleReplacement（HMR）:
+
+开发模式下devserver里面写一个hot：true。生产模式不行，dev-server默认自带。但js代码需要配置。（if（module.hot）{module.hot.accept(文件)}）用vue react脚手架时已经配置好。
+
+#### One Of
+
+每一种文件其实只需要进一种loader文件匹配逻辑。不需要都过一遍。配置文件所有loader外面rules里面包一层对象{oneOf：[xxxxxxx]} 
+
+#### Include Exclude
+
+有时候我们使用第三方的库，这些文件都下载到node_modules里面了。都是编译好的。eslint babel这些就不需要检查这里面的东西，所以需要exclude排除。打包就更快。
+
+#### Cache ：Eslint和Babel缓存
+
+在babel-loader里options:{cacheDirectory:true,cacheCompression:false(缓存压缩)}打包后node_modulezhong就产生一个.chache文件。eslint插件里cache：true，cacheLocation：path。resolve(_direname,"../node_module/.cache/eslintcache_")
+
+#### 多进程打包Thread
+
+webpack主要对js代码用eslint babel terser（terser生产环境自己调用）做的。
+
+特别耗时庞大的项目需要开启多线程。（开启线程也需要时间谨慎使用）npm i thread-loader
+
+require（“os”） os.cpus().length(核数)
+
+###### TerserWebpackPlugin
+
+#### Tree Shaking
+
+从打包一整个库到只打包其中一个功能
+
+必须依赖ESmodule。webpack默认开启 
+
+#### Image Minimizer
+
+压缩本地的图片，如果是在线链接引入的形式这个plugin做不了。
+
+npm i image-minimizer-webpack-plugin imagemin -D,之后分有损压缩与无损压缩。需要下载不同的包。
+
+#### Code Split（代码分割）
+
+类似懒加载，不打包成一个文件，把他们分成不同文件。这样就可以做到加载首页时，只加载首页js文件，加载资源减少，速度提升。
+
+ 按需引入，比如界面有一个按钮，最开始就不需要加载点击之后的逻辑代码。import的动态导入。
+
+个人认为是路由懒加载原理。 import（xxxxxx）返回的是一个promise对象。.then((res) =>{comsole,log(res)}）.catch(() => sonsole.log（“失败”)），给按需引入的文件取名字需要在import（)里面用注释的形式定义诸如import（/*wbpackChunkName: xxx*/"path路径"）
+
+但import按需引入的js文件如果很大，那么到时候加载的时候会有等待时间用户体验不好（卡顿），我们想在浏览器空余时间加载这些资源，所以preload prefetch技术应运而生
+
+区别：preload立即加载优先级高；prefetch优先级低空闲时加载
+
+#### Core.js
+
+有时候babel也无法处理一些诸如promiseasync。需要corejs。他是一个做es6以上api的polyfill（补丁）解决兼容性问题
+
+#### PWA
+
+提供离线访问体验：渐进式网络应用程序（progressive web application）是一种可以提供类似于native app体验的web app技术。内部通过service worker实现。让web体验特别好
+
+npm i安装 引入 newplugin 在主文件注册service worker 遇到的问题：注册失败：因为必须要把dist放在根目录才能生效。解决办法：安装一个部署静态资源的库serve -D。 serve dist就会启动一个开发服务器。直接访问dist下的资源。把资源都缓存到Application里面的service workers 资源缓存的地址是在cache storage。
+
+pwa问题：兼容性比较差 
+
