@@ -1,0 +1,25 @@
+# Webpack loader
+
+通过暴露一个函数：module.exports = function(content,map,meta){xxxx}
+
+分类：pre loader，nomal loader，inline loader，post loader（>>>>）
+
+通过配置里面的enforce ；inline通过import引入
+
+raw loader：设置module.exports.raw = true
+
+pitch loader 熔断机制，一旦有返回值就不再执行当前loader的nomal方法以及后面的pitch方法。
+
+#### Loader API
+
+callback(err,content,sourcemap?meta)
+
+async() 异步回调 返回一个callback
+
+getOptions(schema)  获取loader里面的options 里面传一个验证规则，里面指定type类型addtion
+
+emitFile() 产生一个文件
+
+utils.absolutify() 绝对路径
+
+utils.contextify() 相对路径
